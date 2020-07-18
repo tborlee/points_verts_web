@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {getDistance} from 'geolib';
 import {faWalking} from "@fortawesome/free-solid-svg-icons/faWalking";
 import {faCompass} from "@fortawesome/free-solid-svg-icons/faCompass";
 import {faBabyCarriage} from "@fortawesome/free-solid-svg-icons/faBabyCarriage";
@@ -75,11 +76,48 @@ type APIRecordFields = {
 type APIRecord = {
   datasetid: string;
   recordid: string;
+  distance?: number;
   fields: APIRecordFields
 }
 
-type APIResult = {
-  records: APIRecord[];
+const compareWalks = (a: APIRecord, b: APIRecord) => {
+  if (a.fields.statut === b.fields.statut) {
+    if (a.distance != null && b.distance != null) {
+      return a.distance > b.distance ? 1 : -1;
+    }
+  } else {
+    if (a.fields.statut === Status.Cancelled && b.fields.statut !== Status.Cancelled) {
+      return 1;
+    } else if (a.fields.statut !== Status.Cancelled && b.fields.statut === Status.Cancelled) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }
+  return 0;
+}
+
+async function fetchDate(): Promise<Date> {
+  const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+%3E%3D+${new Date().toISOString().slice(0, 10)}&rows=1&sort=-date`);
+  const json = await response.json();
+  return new Date(json.records[0].fields.date);
+}
+
+async function fetchData(date: Date): Promise<APIRecord[]> {
+  const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date.toISOString().slice(0, 10)}&rows=30`);
+  const json = await response.json();
+  return json.records;
+}
+
+async function calculateDistances(position: Position, data: APIRecord[]) {
+  for (let i = 0; i < data.length; i++) {
+    const walk = data[i];
+    const rawDistance = getDistance({
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    }, {latitude: walk.fields.latitude, longitude: walk.fields.longitude});
+    walk.distance = Math.round(rawDistance / 1000);
+  }
 }
 
 function App() {
@@ -88,41 +126,34 @@ function App() {
   const [data, setData] = useState<APIRecord[]>([]);
   const [dataUnavailable, setDataUnavailable] = useState<boolean>(false);
   const [date, setDate] = useState<Date>();
+  const [positionUnavailable, setPositionUnavailable] = useState<boolean>(false);
+  const [position, setPosition] = useState<Position>();
 
   useEffect(() => {
 
-    async function fetchDate() {
-      return await fetch('https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+%3E%3D+2020%2F07%2F18&rows=1&sort=-date')
-        .then(response => response.json())
-        .then(data => data as APIResult)
-        .then(data => new Date(data.records[0].fields.date));
-    }
-
-    async function fetchData(date: Date) {
-      fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date.toISOString().slice(0, 10)}&rows=30`)
-        .then(response => response.json())
-        .then(data => data as APIResult)
-        .then(data => setData(data.records.sort((a, b) => {
-          if (a.fields.statut === Status.Cancelled && b.fields.statut !== Status.Cancelled) {
-            return 1;
-          } else if (a.fields.statut !== Status.Cancelled && b.fields.statut === Status.Cancelled) {
-            return -1;
-          } else {
-            return 0;
+    async function init() {
+      try {
+        const dateFetched = await fetchDate();
+        setDate(dateFetched);
+        const dataFetched = await fetchData(dateFetched);
+        setLoading(false);
+        setData(dataFetched.sort(compareWalks));
+        navigator.geolocation.getCurrentPosition(function (positionFetched) {
+          setPosition(positionFetched);
+          calculateDistances(positionFetched, dataFetched);
+          setData([...dataFetched.sort(compareWalks)]);
+        }, function (error) {
+          if (error.code !== error.PERMISSION_DENIED) {
+            setPositionUnavailable(true);
           }
-        }))).catch(_ => {
+        });
+      } catch (err) {
         setDataUnavailable(true);
-      });
+        setLoading(false);
+      }
     }
 
-    fetchDate().then(async date => {
-      setDate(date);
-      await fetchData(date);
-      setLoading(false);
-    }).catch(_ => {
-      setDataUnavailable(true);
-      setLoading(false);
-    });
+    init();
   }, []);
 
   return (
@@ -135,6 +166,13 @@ function App() {
         plateforme <a href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">ODWB</a> et peuvent ne pas
         correspondre aux données du site officiel.
       </div>
+      {positionUnavailable &&
+      <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer la
+        position pour le moment.</div>}
+      {position &&
+      <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle}/>&nbsp;Les distances sont calculées à vol
+        d'oiseau.
+      </div>}
       {dataUnavailable &&
       <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer les
         données. Rechargez la page pour réessayer.</div>}
@@ -143,7 +181,7 @@ function App() {
           <span className="sr-only">Chargement...</span>
         </div>
       </div>}
-      {data.map((walk) => WalkCard(walk))}
+      {!loading && data.map((walk) => WalkCard(walk))}
     </div>
   );
 }
@@ -161,6 +199,14 @@ const WalkBadge = (walk: APIRecord) => {
   }
 }
 
+const WalkDistance = (walk: APIRecord) => {
+  if (walk.distance != null) {
+    return <span className="badge badge-primary" title="Correspond au calendrier papier">À ~{walk.distance} km</span>;
+  } else {
+    return null;
+  }
+}
+
 const WalkCard = (walk: APIRecord) => (
   <div key={walk.recordid} className="card mb-4 mt-4">
     <div className="card-header">
@@ -170,6 +216,8 @@ const WalkCard = (walk: APIRecord) => (
             icon={walk.fields.activite === Activity.walk ? faWalking : faCompass}/>&nbsp;{walk.fields.localite} ({walk.fields.province})</span>
         </div>
         <div className="col-auto">
+          <WalkDistance {...walk} />
+          &nbsp;
           <WalkBadge {...walk} />
         </div>
       </div>
@@ -208,11 +256,11 @@ const WalkCard = (walk: APIRecord) => (
       </div>
     </div>
     <div className="card-footer">
-      <div className="row">
-        <div className="col-lg-6">
+      <div className="row align-items-center">
+        <div className="col">
           Organisé par <i>{walk.fields.groupement}</i>
         </div>
-        <div className="col-lg-6 text-right">
+        <div className="col-auto text-right">
           {walk.fields.gsm !== undefined && <a href={`tel:${walk.fields.gsm}`}><FontAwesomeIcon
             icon={faPhone}/>&nbsp;{walk.fields.nom} {walk.fields.prenom}</a>}
         </div>

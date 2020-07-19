@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import './App.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getDistance} from 'geolib';
 import {faWalking} from "@fortawesome/free-solid-svg-icons/faWalking";
@@ -98,15 +97,40 @@ const compareWalks = (a: APIRecord, b: APIRecord) => {
 }
 
 async function fetchDate(): Promise<Date> {
-  const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+%3E%3D+${new Date().toISOString().slice(0, 10)}&rows=1&sort=-date`);
-  const json = await response.json();
-  return new Date(json.records[0].fields.date);
+  const stored = localStorage.getItem("next_walk_date");
+  if (stored === null) {
+    localStorage.removeItem("walk_list");
+    const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+%3E%3D+${new Date().toISOString().slice(0, 10)}&rows=1&sort=-date`);
+    const json = await response.json();
+    const date = json.records[0].fields.date;
+    localStorage.setItem("next_walk_date", date);
+    return new Date(date);
+  } else {
+    const date = new Date(stored);
+    const now = new Date();
+    now.setUTCHours(0, 0, 0, 0);
+    if (date.getTime() < now.getTime()) {
+      localStorage.removeItem("next_walk_date");
+      return fetchDate();
+    } else {
+      return new Date(stored);
+    }
+  }
 }
 
 async function fetchData(date: Date): Promise<APIRecord[]> {
-  const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date.toISOString().slice(0, 10)}&rows=30`);
-  const json = await response.json();
-  return json.records;
+  const stored = localStorage.getItem("walk_list");
+  const timestampString = localStorage.getItem("walk_list_timestamp");
+  const timestamp = timestampString === null ? 0 : parseInt(timestampString);
+  if (stored === null || (Date.now() - timestamp > 3600000)) {
+    const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date.toISOString().slice(0, 10)}&rows=30`);
+    const json = await response.json();
+    localStorage.setItem("walk_list", JSON.stringify(json.records));
+    localStorage.setItem("walk_list_timestamp", Date.now().toString());
+    return json.records;
+  } else {
+    return JSON.parse(stored);
+  }
 }
 
 async function calculateDistances(position: Position, data: APIRecord[]) {

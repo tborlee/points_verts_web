@@ -13,7 +13,6 @@ import {faWheelchair} from "@fortawesome/free-solid-svg-icons/faWheelchair";
 import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 import {faExclamationCircle} from "@fortawesome/free-solid-svg-icons/faExclamationCircle";
 import {IconDefinition} from '@fortawesome/fontawesome-svg-core';
-import {faPhone} from "@fortawesome/free-solid-svg-icons/faPhone";
 import {faMapMarker} from "@fortawesome/free-solid-svg-icons/faMapMarker";
 
 enum OuiNon {
@@ -185,7 +184,7 @@ function App() {
       <div className="navbar navbar-light bg-light shadow-sm fixed-top">
         <div className="container d-flex">
           <div className="navbar-brand d-flex align-items-center">
-            <FontAwesomeIcon icon={faWalking}/>&nbsp;
+            <FontAwesomeIcon icon={faWalking} fixedWidth={true}/>&nbsp;
             {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
             {!date && <strong>Marches Adeps</strong>}
           </div>
@@ -193,15 +192,15 @@ function App() {
       </div>
       <div className="container" role="main">
         {positionUnavailable &&
-        <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer
+        <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle} fixedWidth={true}/>&nbsp;Impossible de récupérer
           la
           position pour le moment.</div>}
         {position &&
-        <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle}/>&nbsp;Les distances sont calculées à vol
+        <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle} fixedWidth={true}/>&nbsp;Les distances sont calculées à vol
           d'oiseau.
         </div>}
         {dataUnavailable &&
-        <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer
+        <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle} fixedWidth={true}/>&nbsp;Impossible de récupérer
           les
           données. Rechargez la page pour réessayer.</div>}
         {loading && <div className="text-center">
@@ -248,7 +247,7 @@ const WalkCard = (walk: APIRecord) => (
       <div className="row">
         <div className="col">
           <span><FontAwesomeIcon
-            icon={walk.fields.activite === Activity.walk ? faWalking : faCompass}/>&nbsp;{walk.fields.localite} ({walk.fields.province})</span>
+            icon={walk.fields.activite === Activity.walk ? faWalking : faCompass} fixedWidth={true}/>&nbsp;{walk.fields.localite} ({walk.fields.province})</span>
         </div>
         <div className="col-auto">
           <WalkDistance {...walk} />
@@ -258,9 +257,9 @@ const WalkCard = (walk: APIRecord) => (
       </div>
     </div>
     <div className="card-body">
-      <div className="row">
+      <div className="row align-items-center">
         <div className="col-auto">
-          <FontAwesomeIcon icon={faMapMarker}/>
+          <FontAwesomeIcon icon={faMapMarker} fixedWidth={true}/>
         </div>
         <div className="col">
           <a
@@ -288,7 +287,7 @@ const WalkCard = (walk: APIRecord) => (
         <div className="col-lg-6">
           <div className="row align-items-center">
             <div className="col-auto">
-              <FontAwesomeIcon icon={faTrain}/>
+              <FontAwesomeIcon icon={faTrain} fixedWidth={true}/>
             </div>
             <div className="col">
               {walk.fields.gare}
@@ -314,7 +313,7 @@ const WalkInfo = (props: WalkInfoProps) => {
     return <div className="col-lg-6">
       <div className="row align-items-center">
         <div className="col-auto">
-          <FontAwesomeIcon icon={props.icon}/>
+          <FontAwesomeIcon icon={props.icon} fixedWidth={true}/>
         </div>
         <div className="col">
           {props.description}

@@ -214,7 +214,7 @@ function App() {
       <footer className="footer bg-light">
         <div className="container">
           <span className="text-muted">Origine des données&nbsp;: <a
-            href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">Open Data Wallonie-Bruxelles</a></span>
+            href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">ODWB</a></span>
         </div>
       </footer>
     </>
@@ -258,9 +258,16 @@ const WalkCard = (walk: APIRecord) => (
       </div>
     </div>
     <div className="card-body">
-      <FontAwesomeIcon icon={faMapMarker}/>&nbsp;Points de départ : <a
-      href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>{walk.fields.lieu_de_rendez_vous}</a>
-      {walk.fields.infos_rendez_vous !== undefined && <span> - {walk.fields.infos_rendez_vous}</span>}
+      <div className="row">
+        <div className="col-auto">
+          <FontAwesomeIcon icon={faMapMarker}/>
+        </div>
+        <div className="col">
+          <a
+            href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>{walk.fields.lieu_de_rendez_vous}</a>
+          {walk.fields.infos_rendez_vous !== undefined && <span> - {walk.fields.infos_rendez_vous}</span>}
+        </div>
+      </div>
       <hr/>
       <div className="row">
         <WalkInfo info={walk.fields["15km"]} icon={faWalking} description="Parcours supplémentaire de 15 km"/>
@@ -280,7 +287,7 @@ const WalkCard = (walk: APIRecord) => (
         {walk.fields.gare !== undefined &&
         <div className="col-lg-6">
           <div className="row align-items-center">
-            <div className="col-1">
+            <div className="col-auto">
               <FontAwesomeIcon icon={faTrain}/>
             </div>
             <div className="col">
@@ -291,15 +298,7 @@ const WalkCard = (walk: APIRecord) => (
       </div>
     </div>
     <div className="card-footer">
-      <div className="row align-items-center">
-        <div className="col">
-          Organisé par <i>{walk.fields.groupement}</i>
-        </div>
-        <div className="col-auto text-right">
-          {walk.fields.gsm !== undefined && <a href={`tel:${walk.fields.gsm}`}><FontAwesomeIcon
-            icon={faPhone}/>&nbsp;{walk.fields.nom} {walk.fields.prenom}</a>}
-        </div>
-      </div>
+      Organisé par <i>{walk.fields.groupement}</i>
     </div>
   </div>
 );
@@ -314,7 +313,7 @@ const WalkInfo = (props: WalkInfoProps) => {
   if (props.info === OuiNon.true) {
     return <div className="col-lg-6">
       <div className="row align-items-center">
-        <div className="col-1">
+        <div className="col-auto">
           <FontAwesomeIcon icon={props.icon}/>
         </div>
         <div className="col">

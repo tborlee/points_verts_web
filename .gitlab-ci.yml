@@ -1,6 +1,9 @@
-image: node:12.18-alpine # can be upgraded, depending on your node version used
+include:
+  - template: SAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
 
 pages:
+  image: node:12.18-alpine
   stage: deploy
   script:
     - yarn install

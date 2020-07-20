@@ -181,32 +181,43 @@ function App() {
   }, []);
 
   return (
-    <div className="container">
-      <div className="text-center m-3">
-        {date && <h1>Marches Adeps du {date.toLocaleDateString('fr')}</h1>}
-        {!date && <h1>Marches Adeps</h1>}
-      </div>
-      <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle}/>&nbsp;Les données proviennent de la
-        plateforme <a href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">ODWB</a> et peuvent ne pas
-        correspondre aux données du site officiel.
-      </div>
-      {positionUnavailable &&
-      <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer la
-        position pour le moment.</div>}
-      {position &&
-      <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle}/>&nbsp;Les distances sont calculées à vol
-        d'oiseau.
-      </div>}
-      {dataUnavailable &&
-      <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer les
-        données. Rechargez la page pour réessayer.</div>}
-      {loading && <div className="text-center">
-        <div className="spinner-border" role="status">
-          <span className="sr-only">Chargement...</span>
+    <>
+      <div className="navbar navbar-light bg-light shadow-sm fixed-top">
+        <div className="container d-flex">
+          <div className="navbar-brand d-flex align-items-center">
+            <FontAwesomeIcon icon={faWalking}/>&nbsp;
+            {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
+            {!date && <strong>Marches Adeps</strong>}
+          </div>
         </div>
-      </div>}
-      {!loading && data.map((walk) => WalkCard(walk))}
-    </div>
+      </div>
+      <div className="container" role="main">
+        {positionUnavailable &&
+        <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer
+          la
+          position pour le moment.</div>}
+        {position &&
+        <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle}/>&nbsp;Les distances sont calculées à vol
+          d'oiseau.
+        </div>}
+        {dataUnavailable &&
+        <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle}/>&nbsp;Impossible de récupérer
+          les
+          données. Rechargez la page pour réessayer.</div>}
+        {loading && <div className="text-center">
+          <div className="spinner-border" role="status">
+            <span className="sr-only">Chargement...</span>
+          </div>
+        </div>}
+        {!loading && data.map((walk) => WalkCard(walk))}
+      </div>
+      <footer className="footer bg-light">
+        <div className="container">
+          <span className="text-muted">Origine des données&nbsp;: <a
+            href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">Open Data Wallonie-Bruxelles</a></span>
+        </div>
+      </footer>
+    </>
   );
 }
 

@@ -191,7 +191,7 @@ function App() {
               {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
               {!date && <strong>Marches Adeps</strong>}
             </div>
-            <div className="d-none d-lg-block">
+            <div className="d-none d-md-block">
               <a className="btn btn-outline-secondary"
                  href='https://play.google.com/store/apps/details?id=dev.alpagaga.points_verts'>
                 <FontAwesomeIcon icon={faAndroid} fixedWidth={true}/>

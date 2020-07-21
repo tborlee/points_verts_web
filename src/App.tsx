@@ -14,6 +14,8 @@ import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 import {faExclamationCircle} from "@fortawesome/free-solid-svg-icons/faExclamationCircle";
 import {IconDefinition} from '@fortawesome/fontawesome-svg-core';
 import {faMapMarker} from "@fortawesome/free-solid-svg-icons/faMapMarker";
+import {faAndroid} from "@fortawesome/free-brands-svg-icons/faAndroid";
+import {faApple} from "@fortawesome/free-brands-svg-icons/faApple";
 
 enum OuiNon {
   true = "Oui",
@@ -181,26 +183,43 @@ function App() {
 
   return (
     <>
-      <div className="navbar navbar-light bg-light shadow-sm fixed-top">
-        <div className="container d-flex">
-          <div className="navbar-brand d-flex align-items-center">
-            <FontAwesomeIcon icon={faWalking} fixedWidth={true}/>&nbsp;
-            {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
-            {!date && <strong>Marches Adeps</strong>}
+      <header>
+        <div className="navbar navbar-light bg-light shadow-sm fixed-top">
+          <div className="container d-flex justify-content-between">
+            <div className="navbar-brand d-flex align-items-center">
+              <FontAwesomeIcon icon={faWalking} fixedWidth={true}/>&nbsp;
+              {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
+              {!date && <strong>Marches Adeps</strong>}
+            </div>
+            <div className="d-none d-lg-block">
+              <a className="btn btn-outline-secondary"
+                 href='https://play.google.com/store/apps/details?id=dev.alpagaga.points_verts'>
+                <FontAwesomeIcon icon={faAndroid} fixedWidth={true}/>
+              </a>
+              &nbsp;
+              <a className="btn btn-outline-secondary"
+                 href='https://apps.apple.com/us/app/id1522150367'>
+                <FontAwesomeIcon icon={faApple} fixedWidth={true}/>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
+
       <div className="container" role="main">
         {positionUnavailable &&
-        <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle} fixedWidth={true}/>&nbsp;Impossible de récupérer
+        <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle}
+                                                              fixedWidth={true}/>&nbsp;Impossible de récupérer
           la
           position pour le moment.</div>}
         {position &&
-        <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle} fixedWidth={true}/>&nbsp;Les distances sont calculées à vol
+        <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle} fixedWidth={true}/>&nbsp;Les distances
+          sont calculées à vol
           d'oiseau.
         </div>}
         {dataUnavailable &&
-        <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle} fixedWidth={true}/>&nbsp;Impossible de récupérer
+        <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle}
+                                                             fixedWidth={true}/>&nbsp;Impossible de récupérer
           les
           données. Rechargez la page pour réessayer.</div>}
         {loading && <div className="text-center">
@@ -247,7 +266,8 @@ const WalkCard = (walk: APIRecord) => (
       <div className="row">
         <div className="col">
           <span><FontAwesomeIcon
-            icon={walk.fields.activite === Activity.walk ? faWalking : faCompass} fixedWidth={true}/>&nbsp;{walk.fields.localite} ({walk.fields.province})</span>
+            icon={walk.fields.activite === Activity.walk ? faWalking : faCompass}
+            fixedWidth={true}/>&nbsp;{walk.fields.localite} ({walk.fields.province})</span>
         </div>
         <div className="col-auto">
           <WalkDistance {...walk} />

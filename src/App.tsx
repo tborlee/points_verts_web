@@ -278,42 +278,57 @@ const WalkCard = (walk: APIRecord) => (
     </div>
     <div className="card-body">
       <div className="row align-items-center">
-        <div className="col-auto">
-          <FontAwesomeIcon icon={faMapMarker} fixedWidth={true}/>
+        <div className="col-md-auto text-center">
+          <img
+            className="rounded mx-auto d-block"
+            loading="lazy"
+            width={150}
+            height={150}
+            src={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s(${walk.fields.longitude},${walk.fields.latitude})/${walk.fields.longitude},${walk.fields.latitude},7,0,0/150x150?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`}
+            alt="Carte"/>
         </div>
-        <div className="col">
-          <a
-            href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>{walk.fields.lieu_de_rendez_vous}</a>
-          {walk.fields.infos_rendez_vous !== undefined && <span> - {walk.fields.infos_rendez_vous}</span>}
-        </div>
-      </div>
-      <hr/>
-      <div className="row">
-        <WalkInfo info={walk.fields["15km"]} icon={faWalking} description="Parcours supplémentaire de 15 km"/>
-        <WalkInfo info={walk.fields.pmr} icon={faWheelchair}
-                  description="Parcours de 5km accessible aux PMRs et aux landaus"/>
-        <WalkInfo info={walk.fields.poussettes} icon={faBabyCarriage}
-                  description="Parcours de 5km accessible aux landaus"/>
-        <WalkInfo info={walk.fields.orientiation} icon={faCompass}
-                  description="Parcours supplémentaire d'orientation de +/- 8km Cartes I.G.N"/>
-        <WalkInfo info={walk.fields.balade_guidee} icon={faBinoculars} description="Balade guidée Nature"/>
-        <WalkInfo info={walk.fields["10km"]} icon={faWalking}
-                  description="Parcours supplémentaire de marche de +/- 10km"/>
-        <WalkInfo info={walk.fields.velo} icon={faBiking} description="Parcours supplémentaire de vélo de +/- 20km"/>
-        <WalkInfo info={walk.fields.vtt} icon={faBiking} description="Parcours supplémentaire de vélo tout-terrain"/>
-        <WalkInfo info={walk.fields.ravitaillement} icon={faWater} description="Ravitaillement"/>
-        <WalkInfo info={walk.fields.bewapp} icon={faTrash} description="Wallonie Plus Propre"/>
-        {walk.fields.gare !== undefined &&
-        <div className="col-lg-6">
+        <div className="col-md">
           <div className="row align-items-center">
             <div className="col-auto">
-              <FontAwesomeIcon icon={faTrain} fixedWidth={true}/>
+              <FontAwesomeIcon icon={faMapMarker} fixedWidth={true}/>
             </div>
             <div className="col">
-              {walk.fields.gare}
+              <a
+                href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>{walk.fields.lieu_de_rendez_vous}</a>
+              {walk.fields.infos_rendez_vous !== undefined && <span> - {walk.fields.infos_rendez_vous}</span>}
             </div>
           </div>
-        </div>}
+          <hr/>
+          <div className="row">
+            <WalkInfo info={walk.fields["15km"]} icon={faWalking} description="Parcours supplémentaire de 15 km"/>
+            <WalkInfo info={walk.fields.pmr} icon={faWheelchair}
+                      description="Parcours de 5km accessible aux PMRs et aux landaus"/>
+            <WalkInfo info={walk.fields.poussettes} icon={faBabyCarriage}
+                      description="Parcours de 5km accessible aux landaus"/>
+            <WalkInfo info={walk.fields.orientiation} icon={faCompass}
+                      description="Parcours supplémentaire d'orientation de +/- 8km Cartes I.G.N"/>
+            <WalkInfo info={walk.fields.balade_guidee} icon={faBinoculars} description="Balade guidée Nature"/>
+            <WalkInfo info={walk.fields["10km"]} icon={faWalking}
+                      description="Parcours supplémentaire de marche de +/- 10km"/>
+            <WalkInfo info={walk.fields.velo} icon={faBiking}
+                      description="Parcours supplémentaire de vélo de +/- 20km"/>
+            <WalkInfo info={walk.fields.vtt} icon={faBiking}
+                      description="Parcours supplémentaire de vélo tout-terrain"/>
+            <WalkInfo info={walk.fields.ravitaillement} icon={faWater} description="Ravitaillement"/>
+            <WalkInfo info={walk.fields.bewapp} icon={faTrash} description="Wallonie Plus Propre"/>
+            {walk.fields.gare !== undefined &&
+            <div className="col-lg-6">
+              <div className="row align-items-center">
+                <div className="col-auto">
+                  <FontAwesomeIcon icon={faTrain} fixedWidth={true}/>
+                </div>
+                <div className="col">
+                  {walk.fields.gare}
+                </div>
+              </div>
+            </div>}
+          </div>
+        </div>
       </div>
     </div>
     <div className="card-footer">

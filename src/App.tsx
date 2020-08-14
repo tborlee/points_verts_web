@@ -187,7 +187,6 @@ function App() {
         <div className="navbar navbar-light bg-light shadow-sm fixed-top">
           <div className="container d-flex justify-content-between">
             <div className="navbar-brand d-flex align-items-center">
-              <FontAwesomeIcon icon={faWalking} fixedWidth={true}/>&nbsp;
               {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
               {!date && <strong>Marches Adeps</strong>}
             </div>

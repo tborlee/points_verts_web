@@ -183,55 +183,62 @@ function App() {
 
   return (
     <>
-      <header>
-        <div className="navbar navbar-light bg-light shadow-sm fixed-top">
-          <div className="container d-flex justify-content-between">
-            <div className="navbar-brand d-flex align-items-center">
+      <nav className="navbar is-light is-fixed-top" role="navigation" aria-label="main navigation">
+        <div className="container">
+          <div className="navbar-brand">
+            <div className="navbar-item">
+              <span className="icon">
+              <FontAwesomeIcon icon={faWalking} fixedWidth={true}/>
+              </span>
               {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
               {!date && <strong>Marches Adeps</strong>}
             </div>
-            <div className="d-none d-md-block">
-              <a className="btn btn-outline-secondary"
-                 href='https://play.google.com/store/apps/details?id=dev.alpagaga.points_verts'>
-                <FontAwesomeIcon icon={faAndroid} fixedWidth={true}/>
-              </a>
-              &nbsp;
-              <a className="btn btn-outline-secondary"
-                 href='https://apps.apple.com/us/app/id1522150367'>
-                <FontAwesomeIcon icon={faApple} fixedWidth={true}/>
-              </a>
+          </div>
+          <div className="navbar-menu">
+            <div className="navbar-end">
+              <div className="navbar-item">
+                <div className="buttons">
+                  <a className="button btn-outline-secondary"
+                     href='https://play.google.com/store/apps/details?id=dev.alpagaga.points_verts'>
+                    <FontAwesomeIcon icon={faAndroid} fixedWidth={true}/>
+                  </a>
+                  &nbsp;
+                  <a className="button btn-outline-secondary"
+                     href='https://apps.apple.com/us/app/id1522150367'>
+                    <FontAwesomeIcon icon={faApple} fixedWidth={true}/>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </header>
+      </nav>
 
       <div className="container" role="main">
-        {positionUnavailable &&
-        <div className="alert alert-warning"><FontAwesomeIcon icon={faExclamationCircle}
-                                                              fixedWidth={true}/>&nbsp;Impossible de récupérer
-          la
-          position pour le moment.</div>}
-        {position &&
-        <div className="alert alert-info"><FontAwesomeIcon icon={faInfoCircle} fixedWidth={true}/>&nbsp;Les distances
-          sont calculées à vol
-          d'oiseau.
-        </div>}
-        {dataUnavailable &&
-        <div className="alert alert-danger"><FontAwesomeIcon icon={faExclamationCircle}
-                                                             fixedWidth={true}/>&nbsp;Impossible de récupérer
-          les
-          données. Rechargez la page pour réessayer.</div>}
-        {loading && <div className="text-center">
-          <div className="spinner-border" role="status">
-            <span className="sr-only">Chargement...</span>
-          </div>
-        </div>}
-        {!loading && data.map((walk) => WalkCard(walk))}
+        <div className="section">
+          {positionUnavailable &&
+          <div className="notification is-warning"><FontAwesomeIcon icon={faExclamationCircle}
+                                                                    fixedWidth={true}/>&nbsp;Impossible de récupérer
+            la
+            position pour le moment.</div>}
+          {position &&
+          <div className="notification is-info"><FontAwesomeIcon icon={faInfoCircle} fixedWidth={true}/>&nbsp;Les
+            distances
+            sont calculées à vol
+            d'oiseau.
+          </div>}
+          {dataUnavailable &&
+          <div className="notification is-danger"><FontAwesomeIcon icon={faExclamationCircle}
+                                                                   fixedWidth={true}/>&nbsp;Impossible de récupérer
+            les
+            données. Rechargez la page pour réessayer.</div>}
+          {!loading && data.map((walk) => WalkCard(walk))}
+        </div>
       </div>
-      <footer className="footer bg-light">
+      <footer className="footer">
         <div className="container">
-          <span className="text-muted">Origine des données&nbsp;: <a
-            href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">ODWB</a></span>
+          <div className="content has-text-centered">Origine des données&nbsp;: <a
+            href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">ODWB</a></div>
         </div>
       </footer>
     </>
@@ -240,12 +247,12 @@ function App() {
 
 const WalkBadge = (walk: APIRecord) => {
   if (walk.fields.statut === Status.OK) {
-    return <span className="badge badge-info" title="Correspond au calendrier papier">{walk.fields.statut}</span>;
+    return <span className="tag is-info" title="Correspond au calendrier papier">{walk.fields.statut}</span>;
   } else if (walk.fields.statut === Status.Modified) {
-    return <span className="badge badge-warning"
+    return <span className="tag is-warning"
                  title="Modifié par rapport au calendrier papier">{walk.fields.statut}</span>;
   } else if (walk.fields.statut === Status.Cancelled) {
-    return <span className="badge badge-danger" title="Ce Point Vert est annulé !">{walk.fields.statut}</span>;
+    return <span className="tag is-danger" title="Ce Point Vert est annulé !">{walk.fields.statut}</span>;
   } else {
     return null;
   }
@@ -253,7 +260,7 @@ const WalkBadge = (walk: APIRecord) => {
 
 const WalkDistance = (walk: APIRecord) => {
   if (walk.distance != null) {
-    return <span className="badge badge-primary" title="Correspond au calendrier papier">À ~{walk.distance} km</span>;
+    return <span className="badge badge-primary">à ~{walk.distance} km</span>;
   } else {
     return null;
   }
@@ -262,43 +269,38 @@ const WalkDistance = (walk: APIRecord) => {
 const WalkCard = (walk: APIRecord) => (
   <div key={walk.recordid} className="card mb-4 mt-4">
     <div className="card-header">
-      <div className="row">
-        <div className="col">
-          <span><FontAwesomeIcon
-            icon={walk.fields.activite === Activity.walk ? faWalking : faCompass}
-            fixedWidth={true}/>&nbsp;{walk.fields.localite} ({walk.fields.province})</span>
-        </div>
-        <div className="col-auto">
-          <WalkDistance {...walk} />
-          &nbsp;
-          <WalkBadge {...walk} />
-        </div>
+      <div className="card-header-title">
+        <span className="icon"><FontAwesomeIcon icon={walk.fields.activite === Activity.walk ? faWalking : faCompass}
+                                                fixedWidth={true}/></span>
+        <span>{walk.fields.localite} <span className="is-hidden-mobile">({walk.fields.province})</span></span>
+      </div>
+      <div className="card-header-icon">
+        <WalkBadge {...walk} />
       </div>
     </div>
-    <div className="card-body">
-      <div className="row align-items-center">
-        <div className="col-md-auto text-center">
+    <div className="card-content">
+      <div className="columns">
+        <div className="column is-narrow has-text-centered">
           <img
-            className="rounded mx-auto d-block"
             loading="lazy"
             width={150}
             height={150}
             src={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s(${walk.fields.longitude},${walk.fields.latitude})/${walk.fields.longitude},${walk.fields.latitude},7,0,0/150x150?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`}
-            alt="Carte"/>
+            alt={`Carte de ${walk.fields.localite}`}/>
         </div>
-        <div className="col-md">
-          <div className="row align-items-center">
-            <div className="col-auto">
+        <div className="column">
+          <div className="columns is-mobile">
+            <div className="column is-narrow">
               <FontAwesomeIcon icon={faMapMarker} fixedWidth={true}/>
             </div>
-            <div className="col">
+            <div className="column">
               <a
                 href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>{walk.fields.lieu_de_rendez_vous}</a>
+              <span> (<WalkDistance {...walk} />)</span>
               {walk.fields.infos_rendez_vous !== undefined && <span> - {walk.fields.infos_rendez_vous}</span>}
             </div>
           </div>
-          <hr/>
-          <div className="row">
+          <div className="columns is-multiline">
             <WalkInfo info={walk.fields["15km"]} icon={faWalking} description="Parcours supplémentaire de 15 km"/>
             <WalkInfo info={walk.fields.pmr} icon={faWheelchair}
                       description="Parcours de 5km accessible aux PMRs et aux landaus"/>
@@ -316,12 +318,12 @@ const WalkCard = (walk: APIRecord) => (
             <WalkInfo info={walk.fields.ravitaillement} icon={faWater} description="Ravitaillement"/>
             <WalkInfo info={walk.fields.bewapp} icon={faTrash} description="Wallonie Plus Propre"/>
             {walk.fields.gare !== undefined &&
-            <div className="col-lg-6">
-              <div className="row align-items-center">
-                <div className="col-auto">
+            <div className="column">
+              <div className="columns is-mobile">
+                <div className="column is-narrow">
                   <FontAwesomeIcon icon={faTrain} fixedWidth={true}/>
                 </div>
-                <div className="col">
+                <div className="column">
                   {walk.fields.gare}
                 </div>
               </div>
@@ -331,7 +333,9 @@ const WalkCard = (walk: APIRecord) => (
       </div>
     </div>
     <div className="card-footer">
-      Organisé par <i>{walk.fields.groupement}</i>
+      <div className="card-footer-item">
+        <span>Organisé par <i>{walk.fields.groupement}</i></span>
+      </div>
     </div>
   </div>
 );
@@ -344,12 +348,12 @@ type WalkInfoProps = {
 
 const WalkInfo = (props: WalkInfoProps) => {
   if (props.info === OuiNon.true) {
-    return <div className="col-lg-6">
-      <div className="row align-items-center">
-        <div className="col-auto">
+    return <div className="column is-6">
+      <div className="columns is-mobile">
+        <div className="column is-narrow">
           <FontAwesomeIcon icon={props.icon} fixedWidth={true}/>
         </div>
-        <div className="col">
+        <div className="column">
           {props.description}
         </div>
       </div>

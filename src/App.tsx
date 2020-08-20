@@ -183,7 +183,7 @@ function App() {
 
   return (
     <>
-      <nav className="navbar is-light is-fixed-top" role="navigation" aria-label="main navigation">
+      <nav className="navbar is-fixed-top" role="navigation" aria-label="main navigation">
         <div className="container">
           <div className="navbar-brand">
             <div className="navbar-item">

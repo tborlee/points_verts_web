@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import 'bulma/css/bulma.min.css';
+import 'bulma/bulma.sass';
 
 ReactDOM.render(
   <React.StrictMode>

@@ -183,7 +183,7 @@ function App() {
 
   return (
     <>
-      <nav className="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+      <nav className="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
         <div className="container">
           <div className="navbar-brand">
             <div className="navbar-item">
@@ -239,6 +239,10 @@ function App() {
         <div className="container">
           <div className="content has-text-centered">Origine des données&nbsp;: <a
             href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">ODWB</a></div>
+          <div className="content has-text-centered">
+            Les données fournies sur ce site sont purement informatives et leur exactitude dépend de la plateforme
+            utilisée. Nous ne pouvons être tenus responsables de la non-organisation des marches.
+          </div>
         </div>
       </footer>
     </>

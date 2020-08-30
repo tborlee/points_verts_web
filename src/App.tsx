@@ -16,6 +16,7 @@ import {IconDefinition} from '@fortawesome/fontawesome-svg-core';
 import {faMapMarker} from "@fortawesome/free-solid-svg-icons/faMapMarker";
 import {faAndroid} from "@fortawesome/free-brands-svg-icons/faAndroid";
 import {faApple} from "@fortawesome/free-brands-svg-icons/faApple";
+import MapboxMap from "./MapboxMap";
 
 enum OuiNon {
   true = "Oui",
@@ -73,7 +74,7 @@ type APIRecordFields = {
   gsm: string;
 }
 
-type APIRecord = {
+export type APIRecord = {
   datasetid: string;
   recordid: string;
   distance?: number;
@@ -285,12 +286,7 @@ const WalkCard = (walk: APIRecord) => (
     <div className="card-content">
       <div className="columns">
         <div className="column is-narrow has-text-centered">
-          <img
-            loading="lazy"
-            width={150}
-            height={150}
-            src={`https://api.mapbox.com/styles/v1/mapbox/${window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-v10' : 'light-v10'}/static/pin-s(${walk.fields.longitude},${walk.fields.latitude})/${walk.fields.longitude},${walk.fields.latitude},7,0,0/150x150?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`}
-            alt={`Carte de ${walk.fields.localite}`}/>
+          <MapboxMap {...walk} />
         </div>
         <div className="column">
           <div className="columns is-mobile">
@@ -343,6 +339,8 @@ const WalkCard = (walk: APIRecord) => (
     </div>
   </div>
 );
+
+
 
 type WalkInfoProps = {
   info: OuiNon,

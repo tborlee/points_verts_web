@@ -16,6 +16,8 @@ import { faAndroid } from "@fortawesome/free-brands-svg-icons/faAndroid";
 import { faApple } from "@fortawesome/free-brands-svg-icons/faApple";
 import MapboxMap from "./MapboxMap";
 import { Banner, BannerType } from "./Banner";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons/faArrowRight";
 
 enum OuiNon {
   true = "Oui",
@@ -73,6 +75,11 @@ type APIRecordFields = {
   gsm: string;
 };
 
+type APIDate = {
+  x: { year: number; month: number; day: number };
+  walk_count: number;
+};
+
 export type APIRecord = {
   datasetid: string;
   recordid: string;
@@ -115,37 +122,6 @@ const retrieveDateFromQuery = (): Date | null => {
   return null;
 };
 
-async function fetchDate(): Promise<Date> {
-  const dateFromQuery = retrieveDateFromQuery();
-  if (dateFromQuery != null) {
-    return dateFromQuery;
-  }
-
-  const stored = localStorage.getItem("next_walk_date");
-  if (stored === null) {
-    localStorage.removeItem("walk_list");
-    const response = await fetch(
-      `https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+%3E%3D+${new Date()
-        .toISOString()
-        .slice(0, 10)}&rows=1&sort=-date`
-    );
-    const json = await response.json();
-    const date = json.records[0].fields.date;
-    localStorage.setItem("next_walk_date", date);
-    return new Date(date);
-  } else {
-    const date = new Date(stored);
-    const now = new Date();
-    now.setUTCHours(0, 0, 0, 0);
-    if (date.getTime() < now.getTime()) {
-      localStorage.removeItem("next_walk_date");
-      return fetchDate();
-    } else {
-      return new Date(stored);
-    }
-  }
-}
-
 async function fetchData(date: Date): Promise<APIRecord[]> {
   const response = await fetch(
     `https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date
@@ -154,6 +130,17 @@ async function fetchData(date: Date): Promise<APIRecord[]> {
   );
   const json = await response.json();
   return json.records;
+}
+
+async function fetchDates(): Promise<Date[]> {
+  const response = await fetch(
+    "https://www.odwb.be/api/records/1.0/analyze/?dataset=points-verts-de-ladeps&x=date&y.walks_count.expr=id&y.walks_count.func=COUNT"
+  );
+  const json = await response.json();
+  return json.map(
+    (date: APIDate) =>
+      new Date(Date.parse(`${date.x.year}-${date.x.month}-${date.x.day}`))
+  );
 }
 
 async function calculateDistances(position: Position, data: APIRecord[]) {
@@ -170,11 +157,34 @@ async function calculateDistances(position: Position, data: APIRecord[]) {
   }
 }
 
+function findNextDateIndex(dates: Date[]): number | undefined {
+  const fromQuery = retrieveDateFromQuery();
+  if (fromQuery !== null) {
+    for (let i = 0; i < dates.length; i++) {
+      const date = dates[i].getTime();
+      if (date === fromQuery.getTime()) {
+        return i;
+      }
+    }
+    return undefined;
+  }
+  const today = Date.now();
+  for (let i = 0; i < dates.length; i++) {
+    const date = dates[i].getTime();
+    if (date > today) {
+      return i;
+    }
+  }
+  // for some reasons, all dates are in the past, so use the last date.
+  return dates.length - 1;
+}
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<APIRecord[]>([]);
   const [dataUnavailable, setDataUnavailable] = useState<boolean>(false);
-  const [date, setDate] = useState<Date>();
+  const [dates, setDates] = useState<Date[]>([]);
+  const [dateIndex, setDateIndex] = useState<number>();
   const [positionUnavailable, setPositionUnavailable] = useState<boolean>(
     false
   );
@@ -183,9 +193,29 @@ function App() {
   useEffect(() => {
     async function init() {
       try {
-        const dateFetched = await fetchDate();
-        setDate(dateFetched);
-        const dataFetched = await fetchData(dateFetched);
+        const datesFetched = await fetchDates();
+        setDates(datesFetched);
+        const dateIndex = findNextDateIndex(datesFetched);
+        if (dateIndex !== undefined) {
+          setDateIndex(dateIndex);
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
+        console.log(err);
+        setDataUnavailable(true);
+        setLoading(false);
+      }
+    }
+
+    init();
+  }, []);
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const dataFetched =
+          dateIndex !== undefined ? await fetchData(dates[dateIndex]) : [];
         setLoading(false);
         setData(dataFetched.sort(compareWalks));
         if (dataFetched.length !== 0) {
@@ -203,13 +233,16 @@ function App() {
           );
         }
       } catch (err) {
+        console.log(err);
         setDataUnavailable(true);
         setLoading(false);
       }
     }
 
-    init();
-  }, []);
+    if (dates.length > 0 && dateIndex !== undefined) {
+      fetch();
+    }
+  }, [dates, dateIndex]);
 
   return (
     <>
@@ -224,12 +257,12 @@ function App() {
               <span className="icon">
                 <FontAwesomeIcon icon={faWalking} fixedWidth={true} />
               </span>
-              {date && (
+              {dateIndex && (
                 <strong>
-                  Marches Adeps du {date.toLocaleDateString("fr")}
+                  Marches Adeps du {dates[dateIndex].toLocaleDateString("fr")}
                 </strong>
               )}
-              {!date && <strong>Marches Adeps</strong>}
+              {!dateIndex && <strong>Marches Adeps</strong>}
             </div>
           </div>
           <div className="navbar-menu">
@@ -258,7 +291,6 @@ function App() {
 
       <div className="container" role="main">
         <div className="section">
-          {loading && <progress className="progress" max="100" />}
           {positionUnavailable && (
             <Banner
               type={BannerType.warning}
@@ -283,6 +315,47 @@ function App() {
               text="Aucune marche trouvée pour la date sélectionnée."
             />
           )}
+          <div className="columns">
+            <div className="column">
+              <div className="buttons is-left">
+                {dateIndex !== undefined && dateIndex - 1 >= 0 && (
+                  <button
+                    className="button"
+                    onClick={() => {
+                      setDateIndex(dateIndex - 1);
+                      setData([]);
+                      setLoading(true);
+                    }}
+                  >
+                    <span className="icon">
+                      <FontAwesomeIcon icon={faArrowLeft} />
+                    </span>
+                    <span>{dates[dateIndex - 1].toLocaleDateString("fr")}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="column">
+              <div className="buttons is-right">
+                {dateIndex !== undefined && dateIndex + 1 < dates.length && (
+                  <button
+                    className="button"
+                    onClick={() => {
+                      setDateIndex(dateIndex + 1);
+                      setData([]);
+                      setLoading(true);
+                    }}
+                  >
+                    <span>{dates[dateIndex + 1].toLocaleDateString("fr")}</span>
+                    <span className="icon">
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+          {loading && <progress className="progress" max="100" />}
           {!loading && data.map((walk) => WalkCard(walk))}
         </div>
       </div>

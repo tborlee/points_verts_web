@@ -1,36 +1,36 @@
-import React, {useEffect, useState} from 'react';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {getDistance} from 'geolib';
-import {faWalking} from "@fortawesome/free-solid-svg-icons/faWalking";
-import {faCompass} from "@fortawesome/free-solid-svg-icons/faCompass";
-import {faBabyCarriage} from "@fortawesome/free-solid-svg-icons/faBabyCarriage";
-import {faBinoculars} from "@fortawesome/free-solid-svg-icons/faBinoculars";
-import {faBiking} from "@fortawesome/free-solid-svg-icons/faBiking";
-import {faWater} from "@fortawesome/free-solid-svg-icons/faWater";
-import {faTrash} from "@fortawesome/free-solid-svg-icons/faTrash";
-import {faTrain} from "@fortawesome/free-solid-svg-icons/faTrain";
-import {faWheelchair} from "@fortawesome/free-solid-svg-icons/faWheelchair";
-import {IconDefinition} from '@fortawesome/fontawesome-svg-core';
-import {faMapMarker} from "@fortawesome/free-solid-svg-icons/faMapMarker";
-import {faAndroid} from "@fortawesome/free-brands-svg-icons/faAndroid";
-import {faApple} from "@fortawesome/free-brands-svg-icons/faApple";
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getDistance } from "geolib";
+import { faWalking } from "@fortawesome/free-solid-svg-icons/faWalking";
+import { faCompass } from "@fortawesome/free-solid-svg-icons/faCompass";
+import { faBabyCarriage } from "@fortawesome/free-solid-svg-icons/faBabyCarriage";
+import { faBinoculars } from "@fortawesome/free-solid-svg-icons/faBinoculars";
+import { faBiking } from "@fortawesome/free-solid-svg-icons/faBiking";
+import { faWater } from "@fortawesome/free-solid-svg-icons/faWater";
+import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
+import { faTrain } from "@fortawesome/free-solid-svg-icons/faTrain";
+import { faWheelchair } from "@fortawesome/free-solid-svg-icons/faWheelchair";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faMapMarker } from "@fortawesome/free-solid-svg-icons/faMapMarker";
+import { faAndroid } from "@fortawesome/free-brands-svg-icons/faAndroid";
+import { faApple } from "@fortawesome/free-brands-svg-icons/faApple";
 import MapboxMap from "./MapboxMap";
-import {Banner, BannerType} from "./Banner";
+import { Banner, BannerType } from "./Banner";
 
 enum OuiNon {
   true = "Oui",
-  false = "Non"
+  false = "Non",
 }
 
 enum Activity {
   walk = "Marche",
-  orientation = "Orientation"
+  orientation = "Orientation",
 }
 
 enum Status {
   OK = "OK",
   Modified = "Modifié",
-  Cancelled = "Annulé"
+  Cancelled = "Annulé",
 }
 
 enum Province {
@@ -39,7 +39,7 @@ enum Province {
   HainautOuest = "Hainaut Ouest",
   Liege = "Liège",
   Luxembourg = "Luxembourg",
-  Namur = "Namur"
+  Namur = "Namur",
 }
 
 type APIRecordFields = {
@@ -55,7 +55,7 @@ type APIRecordFields = {
   entite: string;
   bewapp: OuiNon;
   id: number;
-  '15km': OuiNon;
+  "15km": OuiNon;
   vtt: OuiNon;
   latitude: string;
   ign: string;
@@ -69,16 +69,16 @@ type APIRecordFields = {
   date: string;
   prenom: string;
   longitude: string;
-  '10km': OuiNon;
+  "10km": OuiNon;
   gsm: string;
-}
+};
 
 export type APIRecord = {
   datasetid: string;
   recordid: string;
   distance?: number;
-  fields: APIRecordFields
-}
+  fields: APIRecordFields;
+};
 
 const compareWalks = (a: APIRecord, b: APIRecord) => {
   if (a.fields.statut === b.fields.statut) {
@@ -86,20 +86,26 @@ const compareWalks = (a: APIRecord, b: APIRecord) => {
       return a.distance > b.distance ? 1 : -1;
     }
   } else {
-    if (a.fields.statut === Status.Cancelled && b.fields.statut !== Status.Cancelled) {
+    if (
+      a.fields.statut === Status.Cancelled &&
+      b.fields.statut !== Status.Cancelled
+    ) {
       return 1;
-    } else if (a.fields.statut !== Status.Cancelled && b.fields.statut === Status.Cancelled) {
+    } else if (
+      a.fields.statut !== Status.Cancelled &&
+      b.fields.statut === Status.Cancelled
+    ) {
       return -1;
     } else {
       return 0;
     }
   }
   return 0;
-}
+};
 
-const retrieveDateFromQuery = (): (Date | null) => {
+const retrieveDateFromQuery = (): Date | null => {
   const query = new URLSearchParams(window.location.search);
-  const dateQuery = query.get('date');
+  const dateQuery = query.get("date");
   if (dateQuery !== null) {
     const potentialDate = Date.parse(dateQuery);
     if (!isNaN(potentialDate)) {
@@ -107,7 +113,7 @@ const retrieveDateFromQuery = (): (Date | null) => {
     }
   }
   return null;
-}
+};
 
 async function fetchDate(): Promise<Date> {
   const dateFromQuery = retrieveDateFromQuery();
@@ -118,7 +124,11 @@ async function fetchDate(): Promise<Date> {
   const stored = localStorage.getItem("next_walk_date");
   if (stored === null) {
     localStorage.removeItem("walk_list");
-    const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+%3E%3D+${new Date().toISOString().slice(0, 10)}&rows=1&sort=-date`);
+    const response = await fetch(
+      `https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date+%3E%3D+${new Date()
+        .toISOString()
+        .slice(0, 10)}&rows=1&sort=-date`
+    );
     const json = await response.json();
     const date = json.records[0].fields.date;
     localStorage.setItem("next_walk_date", date);
@@ -137,7 +147,11 @@ async function fetchDate(): Promise<Date> {
 }
 
 async function fetchData(date: Date): Promise<APIRecord[]> {
-  const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date.toISOString().slice(0, 10)}&rows=30`);
+  const response = await fetch(
+    `https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date
+      .toISOString()
+      .slice(0, 10)}&rows=30`
+  );
   const json = await response.json();
   return json.records;
 }
@@ -145,25 +159,28 @@ async function fetchData(date: Date): Promise<APIRecord[]> {
 async function calculateDistances(position: Position, data: APIRecord[]) {
   for (let i = 0; i < data.length; i++) {
     const walk = data[i];
-    const rawDistance = getDistance({
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude
-    }, {latitude: walk.fields.latitude, longitude: walk.fields.longitude});
+    const rawDistance = getDistance(
+      {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      },
+      { latitude: walk.fields.latitude, longitude: walk.fields.longitude }
+    );
     walk.distance = Math.round(rawDistance / 1000);
   }
 }
 
 function App() {
-
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<APIRecord[]>([]);
   const [dataUnavailable, setDataUnavailable] = useState<boolean>(false);
   const [date, setDate] = useState<Date>();
-  const [positionUnavailable, setPositionUnavailable] = useState<boolean>(false);
+  const [positionUnavailable, setPositionUnavailable] = useState<boolean>(
+    false
+  );
   const [position, setPosition] = useState<Position>();
 
   useEffect(() => {
-
     async function init() {
       try {
         const dateFetched = await fetchDate();
@@ -172,15 +189,18 @@ function App() {
         setLoading(false);
         setData(dataFetched.sort(compareWalks));
         if (dataFetched.length !== 0) {
-          navigator.geolocation.getCurrentPosition(function (positionFetched) {
-            setPosition(positionFetched);
-            calculateDistances(positionFetched, dataFetched);
-            setData([...dataFetched.sort(compareWalks)]);
-          }, function (error) {
-            if (error.code !== error.PERMISSION_DENIED) {
-              setPositionUnavailable(true);
+          navigator.geolocation.getCurrentPosition(
+            function (positionFetched) {
+              setPosition(positionFetched);
+              calculateDistances(positionFetched, dataFetched);
+              setData([...dataFetched.sort(compareWalks)]);
+            },
+            function (error) {
+              if (error.code !== error.PERMISSION_DENIED) {
+                setPositionUnavailable(true);
+              }
             }
-          });
+          );
         }
       } catch (err) {
         setDataUnavailable(true);
@@ -193,14 +213,22 @@ function App() {
 
   return (
     <>
-      <nav className="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+      <nav
+        className="navbar is-fixed-top has-shadow"
+        role="navigation"
+        aria-label="main navigation"
+      >
         <div className="container">
           <div className="navbar-brand">
             <div className="navbar-item">
               <span className="icon">
-              <FontAwesomeIcon icon={faWalking} fixedWidth={true}/>
+                <FontAwesomeIcon icon={faWalking} fixedWidth={true} />
               </span>
-              {date && <strong>Marches Adeps du {date.toLocaleDateString('fr')}</strong>}
+              {date && (
+                <strong>
+                  Marches Adeps du {date.toLocaleDateString("fr")}
+                </strong>
+              )}
               {!date && <strong>Marches Adeps</strong>}
             </div>
           </div>
@@ -208,14 +236,18 @@ function App() {
             <div className="navbar-end">
               <div className="navbar-item">
                 <div className="buttons">
-                  <a className="button btn-outline-secondary"
-                     href='https://play.google.com/store/apps/details?id=dev.alpagaga.points_verts'>
-                    <FontAwesomeIcon icon={faAndroid} fixedWidth={true}/>
+                  <a
+                    className="button btn-outline-secondary"
+                    href="https://play.google.com/store/apps/details?id=dev.alpagaga.points_verts"
+                  >
+                    <FontAwesomeIcon icon={faAndroid} fixedWidth={true} />
                   </a>
                   &nbsp;
-                  <a className="button btn-outline-secondary"
-                     href='https://apps.apple.com/us/app/id1522150367'>
-                    <FontAwesomeIcon icon={faApple} fixedWidth={true}/>
+                  <a
+                    className="button btn-outline-secondary"
+                    href="https://apps.apple.com/us/app/id1522150367"
+                  >
+                    <FontAwesomeIcon icon={faApple} fixedWidth={true} />
                   </a>
                 </div>
               </div>
@@ -226,30 +258,50 @@ function App() {
 
       <div className="container" role="main">
         <div className="section">
-          {loading && <progress className="progress" max="100"/>}
-          {positionUnavailable &&
-          <Banner type={BannerType.warning} text="Impossible de récupérer la position pour le moment."/>
-          }
-          {position &&
-          <Banner type={BannerType.info} text="Les distances sont calculées à vol d'oiseau."/>
-          }
-          {dataUnavailable &&
-          <Banner type={BannerType.error}
-                  text="Impossible de récupérer les données. Rechargez la page pour réessayer."/>
-          }
-          {!loading && data.length === 0 &&
-          <Banner type={BannerType.warning} text="Aucune marche trouvée pour la date sélectionnée."/>
-          }
+          {loading && <progress className="progress" max="100" />}
+          {positionUnavailable && (
+            <Banner
+              type={BannerType.warning}
+              text="Impossible de récupérer la position pour le moment."
+            />
+          )}
+          {position && (
+            <Banner
+              type={BannerType.info}
+              text="Les distances sont calculées à vol d'oiseau."
+            />
+          )}
+          {dataUnavailable && (
+            <Banner
+              type={BannerType.error}
+              text="Impossible de récupérer les données. Rechargez la page pour réessayer."
+            />
+          )}
+          {!loading && data.length === 0 && (
+            <Banner
+              type={BannerType.warning}
+              text="Aucune marche trouvée pour la date sélectionnée."
+            />
+          )}
           {!loading && data.map((walk) => WalkCard(walk))}
         </div>
       </div>
       <footer className="footer">
         <div className="container">
-          <div className="content has-text-centered">Origine des données&nbsp;: <a
-            href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">ODWB</a></div>
           <div className="content has-text-centered">
-            Les données fournies sur ce site sont purement informatives et leur exactitude dépend de la plateforme
-            utilisée. Nous ne pouvons être tenus responsables de la non-organisation des marches.
+            Origine des données&nbsp;:{" "}
+            <a href="https://www.odwb.be/explore/dataset/points-verts-de-ladeps/t">
+              ODWB
+            </a>
+          </div>
+          <div className="content has-text-centered">
+            Les données fournies sur ce site sont purement informatives et leur
+            exactitude dépend de la plateforme utilisée. Nous ne pouvons être
+            tenus responsables de la non-organisation des marches.
+          </div>
+          <div className="content has-text-centered">
+            Site conçu à l'aide de <a href="https://reactjs.org/">React</a> et{" "}
+            <a href="https://bulma.io/">Bulma</a>.
           </div>
         </div>
       </footer>
@@ -259,16 +311,30 @@ function App() {
 
 const WalkBadge = (walk: APIRecord) => {
   if (walk.fields.statut === Status.OK) {
-    return <span className="tag is-info" title="Correspond au calendrier papier">{walk.fields.statut}</span>;
+    return (
+      <span className="tag is-info" title="Correspond au calendrier papier">
+        {walk.fields.statut}
+      </span>
+    );
   } else if (walk.fields.statut === Status.Modified) {
-    return <span className="tag is-warning"
-                 title="Modifié par rapport au calendrier papier">{walk.fields.statut}</span>;
+    return (
+      <span
+        className="tag is-warning"
+        title="Modifié par rapport au calendrier papier"
+      >
+        {walk.fields.statut}
+      </span>
+    );
   } else if (walk.fields.statut === Status.Cancelled) {
-    return <span className="tag is-danger" title="Ce Point Vert est annulé !">{walk.fields.statut}</span>;
+    return (
+      <span className="tag is-danger" title="Ce Point Vert est annulé !">
+        {walk.fields.statut}
+      </span>
+    );
   } else {
     return null;
   }
-}
+};
 
 const WalkDistance = (walk: APIRecord) => {
   if (walk.distance != null) {
@@ -276,15 +342,24 @@ const WalkDistance = (walk: APIRecord) => {
   } else {
     return null;
   }
-}
+};
 
 const WalkCard = (walk: APIRecord) => (
   <div key={walk.recordid} className="card mb-4 mt-4">
     <div className="card-header">
       <div className="card-header-title">
-        <span className="icon"><FontAwesomeIcon icon={walk.fields.activite === Activity.walk ? faWalking : faCompass}
-                                                fixedWidth={true}/></span>
-        <span>{walk.fields.localite} <span className="is-hidden-mobile">({walk.fields.province})</span></span>
+        <span className="icon">
+          <FontAwesomeIcon
+            icon={
+              walk.fields.activite === Activity.walk ? faWalking : faCompass
+            }
+            fixedWidth={true}
+          />
+        </span>
+        <span>
+          {walk.fields.localite}{" "}
+          <span className="is-hidden-mobile">({walk.fields.province})</span>
+        </span>
       </div>
       <div className="card-header-icon">
         <WalkBadge {...walk} />
@@ -298,74 +373,114 @@ const WalkCard = (walk: APIRecord) => (
         <div className="column">
           <div className="columns is-mobile">
             <div className="column is-narrow">
-              <FontAwesomeIcon icon={faMapMarker} fixedWidth={true}/>
+              <FontAwesomeIcon icon={faMapMarker} fixedWidth={true} />
             </div>
             <div className="column">
-              <a
-                href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>{walk.fields.lieu_de_rendez_vous}</a>
-              <span> <WalkDistance {...walk} /></span>
-              {walk.fields.infos_rendez_vous !== undefined && <span> - {walk.fields.infos_rendez_vous}</span>}
+              <a href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>
+                {walk.fields.lieu_de_rendez_vous}
+              </a>
+              <span>
+                {" "}
+                <WalkDistance {...walk} />
+              </span>
+              {walk.fields.infos_rendez_vous !== undefined && (
+                <span> - {walk.fields.infos_rendez_vous}</span>
+              )}
             </div>
           </div>
           <div className="columns is-multiline">
-            <WalkInfo info={walk.fields["15km"]} icon={faWalking} description="Parcours supplémentaire de 15 km"/>
-            <WalkInfo info={walk.fields.pmr} icon={faWheelchair}
-                      description="Parcours de 5km accessible aux PMRs et aux landaus"/>
-            <WalkInfo info={walk.fields.poussettes} icon={faBabyCarriage}
-                      description="Parcours de 5km accessible aux landaus"/>
-            <WalkInfo info={walk.fields.orientiation} icon={faCompass}
-                      description="Parcours supplémentaire d'orientation de +/- 8km Cartes I.G.N"/>
-            <WalkInfo info={walk.fields.balade_guidee} icon={faBinoculars} description="Balade guidée Nature"/>
-            <WalkInfo info={walk.fields["10km"]} icon={faWalking}
-                      description="Parcours supplémentaire de marche de +/- 10km"/>
-            <WalkInfo info={walk.fields.velo} icon={faBiking}
-                      description="Parcours supplémentaire de vélo de +/- 20km"/>
-            <WalkInfo info={walk.fields.vtt} icon={faBiking}
-                      description="Parcours supplémentaire de vélo tout-terrain"/>
-            <WalkInfo info={walk.fields.ravitaillement} icon={faWater} description="Ravitaillement"/>
-            <WalkInfo info={walk.fields.bewapp} icon={faTrash} description="Wallonie Plus Propre"/>
-            {walk.fields.gare !== undefined &&
-            <div className="column">
-              <div className="columns is-mobile">
-                <div className="column is-narrow">
-                  <FontAwesomeIcon icon={faTrain} fixedWidth={true}/>
-                </div>
-                <div className="column">
-                  {walk.fields.gare}
+            <WalkInfo
+              info={walk.fields["15km"]}
+              icon={faWalking}
+              description="Parcours supplémentaire de 15 km"
+            />
+            <WalkInfo
+              info={walk.fields.pmr}
+              icon={faWheelchair}
+              description="Parcours de 5km accessible aux PMRs et aux landaus"
+            />
+            <WalkInfo
+              info={walk.fields.poussettes}
+              icon={faBabyCarriage}
+              description="Parcours de 5km accessible aux landaus"
+            />
+            <WalkInfo
+              info={walk.fields.orientiation}
+              icon={faCompass}
+              description="Parcours supplémentaire d'orientation de +/- 8km Cartes I.G.N"
+            />
+            <WalkInfo
+              info={walk.fields.balade_guidee}
+              icon={faBinoculars}
+              description="Balade guidée Nature"
+            />
+            <WalkInfo
+              info={walk.fields["10km"]}
+              icon={faWalking}
+              description="Parcours supplémentaire de marche de +/- 10km"
+            />
+            <WalkInfo
+              info={walk.fields.velo}
+              icon={faBiking}
+              description="Parcours supplémentaire de vélo de +/- 20km"
+            />
+            <WalkInfo
+              info={walk.fields.vtt}
+              icon={faBiking}
+              description="Parcours supplémentaire de vélo tout-terrain"
+            />
+            <WalkInfo
+              info={walk.fields.ravitaillement}
+              icon={faWater}
+              description="Ravitaillement"
+            />
+            <WalkInfo
+              info={walk.fields.bewapp}
+              icon={faTrash}
+              description="Wallonie Plus Propre"
+            />
+            {walk.fields.gare !== undefined && (
+              <div className="column">
+                <div className="columns is-mobile">
+                  <div className="column is-narrow">
+                    <FontAwesomeIcon icon={faTrain} fixedWidth={true} />
+                  </div>
+                  <div className="column">{walk.fields.gare}</div>
                 </div>
               </div>
-            </div>}
+            )}
           </div>
         </div>
       </div>
     </div>
     <div className="card-footer">
       <div className="card-footer-item">
-        <span>Organisé par <i>{walk.fields.groupement}</i></span>
+        <span>
+          Organisé par <i>{walk.fields.groupement}</i>
+        </span>
       </div>
     </div>
   </div>
 );
 
-
 type WalkInfoProps = {
-  info: OuiNon,
-  icon: IconDefinition,
-  description: string
-}
+  info: OuiNon;
+  icon: IconDefinition;
+  description: string;
+};
 
 const WalkInfo = (props: WalkInfoProps) => {
   if (props.info === OuiNon.true) {
-    return <div className="column is-6">
-      <div className="columns is-mobile">
-        <div className="column is-narrow">
-          <FontAwesomeIcon icon={props.icon} fixedWidth={true}/>
-        </div>
-        <div className="column">
-          {props.description}
+    return (
+      <div className="column is-6">
+        <div className="columns is-mobile">
+          <div className="column is-narrow">
+            <FontAwesomeIcon icon={props.icon} fixedWidth={true} />
+          </div>
+          <div className="column">{props.description}</div>
         </div>
       </div>
-    </div>
+    );
   } else {
     return null;
   }

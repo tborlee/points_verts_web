@@ -10,13 +10,12 @@ import {faWater} from "@fortawesome/free-solid-svg-icons/faWater";
 import {faTrash} from "@fortawesome/free-solid-svg-icons/faTrash";
 import {faTrain} from "@fortawesome/free-solid-svg-icons/faTrain";
 import {faWheelchair} from "@fortawesome/free-solid-svg-icons/faWheelchair";
-import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
-import {faExclamationCircle} from "@fortawesome/free-solid-svg-icons/faExclamationCircle";
 import {IconDefinition} from '@fortawesome/fontawesome-svg-core';
 import {faMapMarker} from "@fortawesome/free-solid-svg-icons/faMapMarker";
 import {faAndroid} from "@fortawesome/free-brands-svg-icons/faAndroid";
 import {faApple} from "@fortawesome/free-brands-svg-icons/faApple";
 import MapboxMap from "./MapboxMap";
+import {Banner, BannerType} from "./Banner";
 
 enum OuiNon {
   true = "Oui",
@@ -98,7 +97,24 @@ const compareWalks = (a: APIRecord, b: APIRecord) => {
   return 0;
 }
 
+const retrieveDateFromQuery = (): (Date | null) => {
+  const query = new URLSearchParams(window.location.search);
+  const dateQuery = query.get('date');
+  if (dateQuery !== null) {
+    const potentialDate = Date.parse(dateQuery);
+    if (!isNaN(potentialDate)) {
+      return new Date(potentialDate);
+    }
+  }
+  return null;
+}
+
 async function fetchDate(): Promise<Date> {
+  const dateFromQuery = retrieveDateFromQuery();
+  if (dateFromQuery != null) {
+    return dateFromQuery;
+  }
+
   const stored = localStorage.getItem("next_walk_date");
   if (stored === null) {
     localStorage.removeItem("walk_list");
@@ -121,18 +137,9 @@ async function fetchDate(): Promise<Date> {
 }
 
 async function fetchData(date: Date): Promise<APIRecord[]> {
-  const stored = localStorage.getItem("walk_list");
-  const timestampString = localStorage.getItem("walk_list_timestamp");
-  const timestamp = timestampString === null ? 0 : parseInt(timestampString);
-  if (stored === null || (Date.now() - timestamp > 3600000)) {
-    const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date.toISOString().slice(0, 10)}&rows=30`);
-    const json = await response.json();
-    localStorage.setItem("walk_list", JSON.stringify(json.records));
-    localStorage.setItem("walk_list_timestamp", Date.now().toString());
-    return json.records;
-  } else {
-    return JSON.parse(stored);
-  }
+  const response = await fetch(`https://www.odwb.be/api/records/1.0/search/?dataset=points-verts-de-ladeps&q=date=${date.toISOString().slice(0, 10)}&rows=30`);
+  const json = await response.json();
+  return json.records;
 }
 
 async function calculateDistances(position: Position, data: APIRecord[]) {
@@ -164,15 +171,17 @@ function App() {
         const dataFetched = await fetchData(dateFetched);
         setLoading(false);
         setData(dataFetched.sort(compareWalks));
-        navigator.geolocation.getCurrentPosition(function (positionFetched) {
-          setPosition(positionFetched);
-          calculateDistances(positionFetched, dataFetched);
-          setData([...dataFetched.sort(compareWalks)]);
-        }, function (error) {
-          if (error.code !== error.PERMISSION_DENIED) {
-            setPositionUnavailable(true);
-          }
-        });
+        if (dataFetched.length !== 0) {
+          navigator.geolocation.getCurrentPosition(function (positionFetched) {
+            setPosition(positionFetched);
+            calculateDistances(positionFetched, dataFetched);
+            setData([...dataFetched.sort(compareWalks)]);
+          }, function (error) {
+            if (error.code !== error.PERMISSION_DENIED) {
+              setPositionUnavailable(true);
+            }
+          });
+        }
       } catch (err) {
         setDataUnavailable(true);
         setLoading(false);
@@ -217,22 +226,20 @@ function App() {
 
       <div className="container" role="main">
         <div className="section">
+          {loading && <progress className="progress" max="100"/>}
           {positionUnavailable &&
-          <div className="notification is-warning"><FontAwesomeIcon icon={faExclamationCircle}
-                                                                    fixedWidth={true}/>&nbsp;Impossible de récupérer
-            la
-            position pour le moment.</div>}
+          <Banner type={BannerType.warning} text="Impossible de récupérer la position pour le moment."/>
+          }
           {position &&
-          <div className="notification is-info"><FontAwesomeIcon icon={faInfoCircle} fixedWidth={true}/>&nbsp;Les
-            distances
-            sont calculées à vol
-            d'oiseau.
-          </div>}
+          <Banner type={BannerType.info} text="Les distances sont calculées à vol d'oiseau."/>
+          }
           {dataUnavailable &&
-          <div className="notification is-danger"><FontAwesomeIcon icon={faExclamationCircle}
-                                                                   fixedWidth={true}/>&nbsp;Impossible de récupérer
-            les
-            données. Rechargez la page pour réessayer.</div>}
+          <Banner type={BannerType.error}
+                  text="Impossible de récupérer les données. Rechargez la page pour réessayer."/>
+          }
+          {!loading && data.length === 0 &&
+          <Banner type={BannerType.warning} text="Aucune marche trouvée pour la date sélectionnée."/>
+          }
           {!loading && data.map((walk) => WalkCard(walk))}
         </div>
       </div>
@@ -339,7 +346,6 @@ const WalkCard = (walk: APIRecord) => (
     </div>
   </div>
 );
-
 
 
 type WalkInfoProps = {

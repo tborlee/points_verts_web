@@ -10,7 +10,7 @@ const MapboxMap = (walk: APIRecord) => {
       loading="lazy"
       width={150}
       height={150}
-      src={`https://api.mapbox.com/styles/v1/mapbox/${mapStyle}/static/pin-s(${walk.fields.longitude},${walk.fields.latitude})/${walk.fields.longitude},${walk.fields.latitude},7,0,0/150x150${res}?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`}
+      src={`https://api.mapbox.com/styles/v1/mapbox/${mapStyle}/static/pin-s(${walk.fields.longitude},${walk.fields.latitude})/${walk.fields.longitude},${walk.fields.latitude},6,0,0/150x150${res}?access_token=${process.env.REACT_APP_MAPBOX_TOKEN}`}
       alt={`Carte de ${walk.fields.localite}`}/>
   )
 }

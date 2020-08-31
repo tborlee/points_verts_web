@@ -139,7 +139,7 @@ async function fetchDates(): Promise<Date[]> {
   const json = await response.json();
   return json.map(
     (date: APIDate) =>
-      new Date(Date.parse(`${date.x.year}-${date.x.month}-${date.x.day}`))
+      new Date(Date.UTC(date.x.year, date.x.month - 1, date.x.day))
   );
 }
 
@@ -315,7 +315,7 @@ function App() {
               text="Aucune marche trouvée pour la date sélectionnée."
             />
           )}
-          <div className="columns">
+          <div className="columns is-mobile">
             <div className="column">
               <div className="buttons is-left">
                 {dateIndex !== undefined && dateIndex - 1 >= 0 && (

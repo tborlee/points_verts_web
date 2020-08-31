@@ -88,7 +88,10 @@ export type APIRecord = {
 };
 
 const compareWalks = (a: APIRecord, b: APIRecord) => {
-  if (a.fields.statut === b.fields.statut) {
+  if (
+    (a.fields.statut === Status.OK || a.fields.statut === Status.Modified) &&
+    (b.fields.statut === Status.OK || b.fields.statut === Status.Modified)
+  ) {
     if (a.distance != null && b.distance != null) {
       return a.distance > b.distance ? 1 : -1;
     }
@@ -155,6 +158,7 @@ async function calculateDistances(position: Position, data: APIRecord[]) {
     );
     walk.distance = Math.round(rawDistance / 1000);
   }
+  return data.sort(compareWalks);
 }
 
 function findNextDateIndex(dates: Date[]): number | undefined {
@@ -204,9 +208,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    async function init() {
-      try {
-        const datesFetched = await fetchDates();
+    try {
+      fetchDates().then((datesFetched) => {
         setDates(datesFetched);
         const dateIndex = findNextDateIndex(datesFetched);
         if (dateIndex !== undefined) {
@@ -214,39 +217,33 @@ function App() {
         } else {
           setLoading(false);
         }
-      } catch (err) {
-        console.log(err);
-        setDataUnavailable(true);
-        setLoading(false);
-      }
+      });
+    } catch (err) {
+      console.log(err);
+      setDataUnavailable(true);
+      setLoading(false);
     }
-
-    init();
   }, []);
 
   useEffect(() => {
-    async function fetch() {
+    if (dates.length > 0 && dateIndex !== undefined) {
       try {
-        const dataFetched =
-          dateIndex !== undefined ? await fetchData(dates[dateIndex]) : [];
-        setData(dataFetched.sort(compareWalks));
-        setLoading(false);
+        fetchData(dates[dateIndex]).then((dataFetched) => {
+          setData(dataFetched.sort(compareWalks));
+          setLoading(false);
+        });
       } catch (err) {
         console.log(err);
         setDataUnavailable(true);
         setLoading(false);
       }
-    }
-
-    if (dates.length > 0 && dateIndex !== undefined) {
-      fetch();
     }
   }, [dates, dateIndex]);
 
   useEffect(() => {
     if (data.length !== 0 && position !== undefined) {
-      calculateDistances(position, data).then((_) => {
-        setData((d) => d.sort(compareWalks));
+      calculateDistances(position, data).then((sorted) => {
+        setData(sorted);
       });
     }
   }, [data, position]);

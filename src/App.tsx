@@ -265,7 +265,7 @@ const WalkBadge = (walk: APIRecord) => {
 
 const WalkDistance = (walk: APIRecord) => {
   if (walk.distance != null) {
-    return <span className="badge badge-primary">à ~{walk.distance} km</span>;
+    return <span className="badge badge-primary">(à ~{walk.distance} km)</span>;
   } else {
     return null;
   }
@@ -296,7 +296,7 @@ const WalkCard = (walk: APIRecord) => (
             <div className="column">
               <a
                 href={`geo:${walk.fields.latitude},${walk.fields.longitude}`}>{walk.fields.lieu_de_rendez_vous}</a>
-              <span> (<WalkDistance {...walk} />)</span>
+              <span> <WalkDistance {...walk} /></span>
               {walk.fields.infos_rendez_vous !== undefined && <span> - {walk.fields.infos_rendez_vous}</span>}
             </div>
           </div>

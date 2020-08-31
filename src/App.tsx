@@ -191,6 +191,19 @@ function App() {
   const [position, setPosition] = useState<Position>();
 
   useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      function (positionFetched) {
+        setPosition(positionFetched);
+      },
+      function (error) {
+        if (error.code !== error.PERMISSION_DENIED) {
+          setPositionUnavailable(true);
+        }
+      }
+    );
+  }, []);
+
+  useEffect(() => {
     async function init() {
       try {
         const datesFetched = await fetchDates();
@@ -216,22 +229,8 @@ function App() {
       try {
         const dataFetched =
           dateIndex !== undefined ? await fetchData(dates[dateIndex]) : [];
-        setLoading(false);
         setData(dataFetched.sort(compareWalks));
-        if (dataFetched.length !== 0) {
-          navigator.geolocation.getCurrentPosition(
-            function (positionFetched) {
-              setPosition(positionFetched);
-              calculateDistances(positionFetched, dataFetched);
-              setData([...dataFetched.sort(compareWalks)]);
-            },
-            function (error) {
-              if (error.code !== error.PERMISSION_DENIED) {
-                setPositionUnavailable(true);
-              }
-            }
-          );
-        }
+        setLoading(false);
       } catch (err) {
         console.log(err);
         setDataUnavailable(true);
@@ -243,6 +242,14 @@ function App() {
       fetch();
     }
   }, [dates, dateIndex]);
+
+  useEffect(() => {
+    if (data.length !== 0 && position !== undefined) {
+      calculateDistances(position, data).then((_) => {
+        setData((d) => d.sort(compareWalks));
+      });
+    }
+  }, [data, position]);
 
   return (
     <>

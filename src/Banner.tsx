@@ -41,7 +41,7 @@ const getCssClass = (type: BannerType) => {
 export const Banner = ({ type, text }: BannerProps) => {
   return (
     <div className={`notification ${getCssClass(type)}`}>
-      <div className="columns">
+      <div className="columns is-mobile">
         <div className="column is-narrow">{getIcon(type)}</div>
         <div className="column">{text}</div>
       </div>

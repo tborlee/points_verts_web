@@ -1,5 +1,14 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Environment Variables
+
+For the Mapbox integration to work, you need to define several environment variables during dev/build:
+
+- `REACT_APP_MAPBOX_TOKEN`: Mapbox access token
+- `REACT_APP_MAPBOX_USERNAME`: your mapbox username
+- `REACT_APP_MAPBOX_LIGHT_STYLE`: id of the light style
+- `REACT_APP_MAPBOX_DARK_STYLE`: id of the dark style
+
 ## Available Scripts
 
 In the project directory, you can run:

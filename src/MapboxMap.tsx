@@ -1,5 +1,5 @@
 import React from "react";
-import { APIRecord } from "./App";
+import { APIRecord } from "./types";
 
 const mapboxAccessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 const mapboxUsername = process.env.REACT_APP_MAPBOX_USERNAME;

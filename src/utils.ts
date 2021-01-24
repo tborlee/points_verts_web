@@ -21,6 +21,9 @@ export const compareWalks = (a: APIRecord, b: APIRecord) => {
     ) {
       return -1;
     } else {
+      if (a.distance != null && b.distance != null) {
+        return a.distance > b.distance ? 1 : -1;
+      }
       return 0;
     }
   }

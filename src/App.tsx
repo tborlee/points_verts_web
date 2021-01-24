@@ -146,7 +146,10 @@ async function fetchDates(): Promise<Date[]> {
   );
 }
 
-async function calculateDistances(position: Position, data: APIRecord[]) {
+async function calculateDistances(
+  position: GeolocationPosition,
+  data: APIRecord[]
+) {
   for (let i = 0; i < data.length; i++) {
     const walk = data[i];
     const rawDistance = getDistance(
@@ -192,7 +195,7 @@ function App() {
   const [positionUnavailable, setPositionUnavailable] = useState<boolean>(
     false
   );
-  const [position, setPosition] = useState<Position>();
+  const [position, setPosition] = useState<GeolocationPosition>();
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(

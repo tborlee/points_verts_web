@@ -10,7 +10,7 @@ const mapStyle: string | undefined = window.matchMedia(
   : process.env.REACT_APP_MAPBOX_LIGHT_STYLE;
 const res = window.devicePixelRatio >= 2 ? "@2x" : "";
 
-const MapboxMap = (walk: APIRecord) => {
+const WalkThumbnail = (walk: APIRecord) => {
   const position = `${walk.fields.longitude},${walk.fields.latitude}`;
   return (
     <img
@@ -23,4 +23,4 @@ const MapboxMap = (walk: APIRecord) => {
   );
 };
 
-export default MapboxMap;
+export default WalkThumbnail;

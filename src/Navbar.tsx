@@ -13,6 +13,7 @@ function Navbar({ dates, dateIndex }: NavbarProps) {
   return (
     <nav
       className="navbar is-fixed-top has-shadow"
+      style={{ zIndex: 5000 }}
       role="navigation"
       aria-label="main navigation"
     >

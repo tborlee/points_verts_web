@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWalking } from "@fortawesome/free-solid-svg-icons/faWalking";
 import { faCompass } from "@fortawesome/free-solid-svg-icons/faCompass";
-import MapboxMap from "./MapboxMap";
+import WalkThumbnail from "./WalkThumbnail";
 import { faMapMarker } from "@fortawesome/free-solid-svg-icons/faMapMarker";
 import { faWheelchair } from "@fortawesome/free-solid-svg-icons/faWheelchair";
 import { faBabyCarriage } from "@fortawesome/free-solid-svg-icons/faBabyCarriage";
@@ -15,7 +15,11 @@ import React from "react";
 import { Activity, APIRecord, OuiNon, Status } from "./types";
 
 const WalkCard = (walk: APIRecord) => (
-  <div key={walk.recordid} className="card mb-4 mt-4">
+  <div
+    id={`walk-${walk.fields.id}`}
+    key={walk.recordid}
+    className="card mb-4 mt-4"
+  >
     <div className="card-header">
       <div className="card-header-title">
         <span className="icon">
@@ -38,7 +42,7 @@ const WalkCard = (walk: APIRecord) => (
     <div className="card-content">
       <div className="columns">
         <div className="column is-narrow has-text-centered">
-          <MapboxMap {...walk} />
+          <WalkThumbnail {...walk} />
         </div>
         <div className="column">
           <div className="columns is-mobile">

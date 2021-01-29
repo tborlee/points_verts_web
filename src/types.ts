@@ -38,7 +38,7 @@ export type APIRecordFields = {
   id: number;
   "15km": OuiNon;
   vtt: OuiNon;
-  latitude: string;
+  latitude: number;
   ign: string;
   localite: string;
   province: Province;
@@ -49,7 +49,7 @@ export type APIRecordFields = {
   infos_rendez_vous: string;
   date: string;
   prenom: string;
-  longitude: string;
+  longitude: number;
   "10km": OuiNon;
   gsm: string;
 };

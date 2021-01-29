@@ -6,6 +6,7 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons/faArrowRight";
 import WalkCard from "./WalkCard";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
+import Map from "./Map";
 import { fetchData, fetchDates } from "./api";
 import { calculateDistances, compareWalks, findNextDateIndex } from "./utils";
 import { APIRecord } from "./types";
@@ -147,8 +148,9 @@ function App() {
               </div>
             </div>
           </div>
+          <Map walks={data} />
           {loading && <progress className="progress" max="100" />}
-          {!loading && data.map((walk) => WalkCard(walk))}
+          {!loading && <>{data.map((walk) => WalkCard(walk))}</>}
         </div>
       </div>
       <Footer />

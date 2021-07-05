@@ -12,6 +12,8 @@ export enum BannerType {
 export type BannerProps = {
   type: BannerType;
   text: string;
+  buttonLabel?: string;
+  onButtonClick?: () => void;
 };
 
 const getIcon = (type: BannerType) => {
@@ -38,12 +40,22 @@ const getCssClass = (type: BannerType) => {
   }
 };
 
-export const Banner = ({ type, text }: BannerProps) => {
+export const Banner = ({
+  type,
+  text,
+  buttonLabel,
+  onButtonClick,
+}: BannerProps) => {
   return (
     <div className={`notification ${getCssClass(type)}`}>
       <div className="columns is-mobile">
         <div className="column is-narrow">{getIcon(type)}</div>
         <div className="column">{text}</div>
+        {buttonLabel && (
+          <div className="column is-narrow">
+            <button onClick={onButtonClick}>{buttonLabel}</button>
+          </div>
+        )}
       </div>
     </div>
   );

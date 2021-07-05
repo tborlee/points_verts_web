@@ -21,19 +21,30 @@ function App() {
     false
   );
   const [position, setPosition] = useState<GeolocationPosition>();
+  const [geoPermission, setGeoPermission] = useState<PermissionState>();
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      function (positionFetched) {
-        setPosition(positionFetched);
-      },
-      function (error) {
-        if (error.code !== error.PERMISSION_DENIED) {
-          setPositionUnavailable(true);
+    if (navigator.geolocation) {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        setGeoPermission(result.state);
+      });
+    }
+  });
+
+  useEffect(() => {
+    if (!position && geoPermission === "granted") {
+      navigator.geolocation.getCurrentPosition(
+        function (positionFetched) {
+          setPosition(positionFetched);
+        },
+        function (error) {
+          if (error.code !== error.PERMISSION_DENIED) {
+            setPositionUnavailable(true);
+          }
         }
-      }
-    );
-  }, []);
+      );
+    }
+  }, [position, geoPermission]);
 
   useEffect(() => {
     try {
@@ -78,12 +89,35 @@ function App() {
     }
   }, [data, position]);
 
+  const requestGeoPermission = () => {
+    navigator.geolocation.getCurrentPosition(
+      function (positionFetched) {
+        setPosition(positionFetched);
+        setGeoPermission("granted");
+      },
+      function (error) {
+        if (error.code !== error.PERMISSION_DENIED) {
+          setPositionUnavailable(true);
+          setGeoPermission("denied");
+        }
+      }
+    );
+  };
+
   return (
     <>
       <Navbar dates={dates} dateIndex={dateIndex} />
 
       <div className="container" role="main">
         <div className="section">
+          {!position && geoPermission === "prompt" && (
+            <Banner
+              type={BannerType.info}
+              text="Pour afficher les distances par rapport à votre emplacement actuel, veuillez autoriser la géolocalisation."
+              buttonLabel="Autoriser"
+              onButtonClick={requestGeoPermission}
+            />
+          )}
           {positionUnavailable && (
             <Banner
               type={BannerType.warning}
@@ -149,7 +183,7 @@ function App() {
             </div>
           </div>
           <Map walks={data} />
-          {loading && <progress className="progress" max="100" />}
+          {loading && <progress className="progress mt-5 mb-5" max="100" />}
           {!loading && <>{data.map((walk) => WalkCard(walk))}</>}
         </div>
       </div>

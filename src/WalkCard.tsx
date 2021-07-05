@@ -171,14 +171,17 @@ const WalkDistance = (walk: APIRecord) => {
 const WalkBadge = (walk: APIRecord) => {
   if (walk.fields.statut === Status.OK) {
     return (
-      <span className="tag is-info" title="Correspond au calendrier papier">
+      <span
+        className="tag is-success has-text-black"
+        title="Correspond au calendrier papier"
+      >
         {walk.fields.statut}
       </span>
     );
   } else if (walk.fields.statut === Status.Modified) {
     return (
       <span
-        className="tag is-warning"
+        className="tag is-warning has-text-black"
         title="Modifié par rapport au calendrier papier"
       >
         {walk.fields.statut}
@@ -186,7 +189,10 @@ const WalkBadge = (walk: APIRecord) => {
     );
   } else if (walk.fields.statut === Status.Cancelled) {
     return (
-      <span className="tag is-danger" title="Ce Point Vert est annulé !">
+      <span
+        className="tag is-danger has-text-black"
+        title="Ce Point Vert est annulé !"
+      >
         {walk.fields.statut}
       </span>
     );

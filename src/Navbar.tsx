@@ -37,6 +37,7 @@ function Navbar({ dates, dateIndex }: NavbarProps) {
               <div className="buttons">
                 <a
                   className="button btn-outline-secondary"
+                  title="Télécharger l'application pour Android"
                   href="https://play.google.com/store/apps/details?id=dev.alpagaga.points_verts"
                 >
                   <FontAwesomeIcon icon={faAndroid} fixedWidth={true} />
@@ -44,6 +45,7 @@ function Navbar({ dates, dateIndex }: NavbarProps) {
                 &nbsp;
                 <a
                   className="button btn-outline-secondary"
+                  title="Télécharger l'application pour iOS"
                   href="https://apps.apple.com/us/app/id1522150367"
                 >
                   <FontAwesomeIcon icon={faApple} fixedWidth={true} />

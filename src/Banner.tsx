@@ -47,7 +47,7 @@ export const Banner = ({
   onButtonClick,
 }: BannerProps) => {
   return (
-    <div className={`notification ${getCssClass(type)}`}>
+    <div className={`notification has-text-black ${getCssClass(type)}`}>
       <div className="columns is-mobile">
         <div className="column is-narrow">{getIcon(type)}</div>
         <div className="column">{text}</div>

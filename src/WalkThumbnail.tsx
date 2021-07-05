@@ -17,8 +17,10 @@ const WalkThumbnail = (walk: APIRecord) => {
       loading="lazy"
       width={150}
       height={150}
+      aria-hidden={true}
       src={`https://api.mapbox.com/styles/v1/${mapboxUsername}/${mapStyle}/static/pin-s(${position})/${position},6,0,0/150x150${res}?access_token=${mapboxAccessToken}`}
       alt={`Carte de ${walk.fields.localite}`}
+      title={`Carte de ${walk.fields.localite}`}
     />
   );
 };

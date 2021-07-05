@@ -33,6 +33,8 @@ function Map({ walks }: MapProps) {
           <Marker
             icon={myIcon}
             key={index}
+            title={walk.fields.localite}
+            alt={walk.fields.localite}
             position={[walk.fields.latitude, walk.fields.longitude]}
           >
             <Popup>

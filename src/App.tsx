@@ -17,34 +17,39 @@ function App() {
   const [dataUnavailable, setDataUnavailable] = useState<boolean>(false);
   const [dates, setDates] = useState<Date[]>([]);
   const [dateIndex, setDateIndex] = useState<number>();
-  const [positionUnavailable, setPositionUnavailable] = useState<boolean>(
-    false
-  );
+  const [positionUnavailable, setPositionUnavailable] =
+    useState<boolean>(false);
   const [position, setPosition] = useState<GeolocationPosition>();
   const [geoPermission, setGeoPermission] = useState<PermissionState>();
 
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
         setGeoPermission(result.state);
       });
+    } else {
+      getCurrentPosition();
     }
   });
 
   useEffect(() => {
     if (!position && geoPermission === "granted") {
-      navigator.geolocation.getCurrentPosition(
-        function (positionFetched) {
-          setPosition(positionFetched);
-        },
-        function (error) {
-          if (error.code !== error.PERMISSION_DENIED) {
-            setPositionUnavailable(true);
-          }
-        }
-      );
+      getCurrentPosition();
     }
   }, [position, geoPermission]);
+
+  const getCurrentPosition = () => {
+    navigator.geolocation.getCurrentPosition(
+      function (positionFetched) {
+        setPosition(positionFetched);
+      },
+      function (error) {
+        if (error.code !== error.PERMISSION_DENIED) {
+          setPositionUnavailable(true);
+        }
+      }
+    );
+  };
 
   useEffect(() => {
     try {

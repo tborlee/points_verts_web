@@ -27,8 +27,10 @@ function App() {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
         setGeoPermission(result.state);
       });
+    } else {
+      setGeoPermission("prompt");
     }
-  });
+  }, []);
 
   useEffect(() => {
     if (!position && geoPermission === "granted") {

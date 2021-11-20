@@ -27,8 +27,6 @@ function App() {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
         setGeoPermission(result.state);
       });
-    } else {
-      getCurrentPosition();
     }
   });
 

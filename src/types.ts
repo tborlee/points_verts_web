@@ -52,6 +52,7 @@ export type APIRecordFields = {
   longitude: number;
   "10km": OuiNon;
   gsm: string;
+  adep_sante: OuiNon;
 };
 
 export type APIDate = {

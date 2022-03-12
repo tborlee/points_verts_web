@@ -10,6 +10,7 @@ import { faBiking } from "@fortawesome/free-solid-svg-icons/faBiking";
 import { faWater } from "@fortawesome/free-solid-svg-icons/faWater";
 import { faTrash } from "@fortawesome/free-solid-svg-icons/faTrash";
 import { faTrain } from "@fortawesome/free-solid-svg-icons/faTrain";
+import { faDumbbell } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import React from "react";
 import { Activity, APIRecord, OuiNon, Status } from "./types";
@@ -66,22 +67,22 @@ const WalkCard = (walk: APIRecord) => (
             <WalkInfo
               info={walk.fields["15km"]}
               icon={faWalking}
-              description="Parcours supplémentaire de 15 km"
+              description="Parcours supplémentaire de 15&nbsp;km"
             />
             <WalkInfo
               info={walk.fields.pmr}
               icon={faWheelchair}
-              description="Parcours de 5km accessible aux PMRs et aux landaus"
+              description="Parcours de 5&nbsp;km accessible aux PMRs accompagnées"
             />
             <WalkInfo
               info={walk.fields.poussettes}
               icon={faBabyCarriage}
-              description="Parcours de 5km accessible aux landaus"
+              description="Parcours de 5&nbsp;km accessible aux landaus"
             />
             <WalkInfo
               info={walk.fields.orientiation}
               icon={faCompass}
-              description="Parcours supplémentaire d'orientation de +/- 8km Cartes I.G.N"
+              description="Parcours supplémentaire d'orientation de +/- 8&nbsp;km Cartes I.G.N"
             />
             <WalkInfo
               info={walk.fields.balade_guidee}
@@ -91,12 +92,12 @@ const WalkCard = (walk: APIRecord) => (
             <WalkInfo
               info={walk.fields["10km"]}
               icon={faWalking}
-              description="Parcours supplémentaire de marche de +/- 10km"
+              description="Parcours supplémentaire de marche de +/- 10&nbsp;km"
             />
             <WalkInfo
               info={walk.fields.velo}
               icon={faBiking}
-              description="Parcours supplémentaire de vélo de +/- 20km"
+              description="Parcours supplémentaire de vélo de +/- 20&nbsp;km"
             />
             <WalkInfo
               info={walk.fields.vtt}
@@ -112,6 +113,11 @@ const WalkCard = (walk: APIRecord) => (
               info={walk.fields.bewapp}
               icon={faTrash}
               description="Wallonie Plus Propre"
+            />
+            <WalkInfo
+              info={walk.fields.adep_sante}
+              icon={faDumbbell}
+              description="Petits exercices réalisables sur le parcours de 5&nbsp;km"
             />
             {walk.fields.gare !== undefined && (
               <div className="column">

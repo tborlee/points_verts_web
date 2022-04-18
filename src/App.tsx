@@ -88,7 +88,7 @@ function App() {
     if (data.length !== 0 && position !== undefined) {
       calculateDistances(position, data).then((sorted) => {
         setLoading(true);
-        setData(sorted);
+        setData([...sorted]);
         setLoading(false);
       });
     }

@@ -1,13 +1,13 @@
 import React from "react";
 import { APIRecord } from "./types";
 
-const mapboxAccessToken = process.env.REACT_APP_MAPBOX_TOKEN;
-const mapboxUsername = process.env.REACT_APP_MAPBOX_USERNAME;
+const mapboxAccessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+const mapboxUsername = import.meta.env.VITE_MAPBOX_USERNAME;
 const mapStyle: string | undefined = window.matchMedia(
   "(prefers-color-scheme: dark)"
 ).matches
-  ? process.env.REACT_APP_MAPBOX_DARK_STYLE
-  : process.env.REACT_APP_MAPBOX_LIGHT_STYLE;
+  ? import.meta.env.VITE_MAPBOX_DARK_STYLE
+  : import.meta.env.VITE_MAPBOX_LIGHT_STYLE;
 const res = window.devicePixelRatio >= 2 ? "@2x" : "";
 
 const WalkThumbnail = (walk: APIRecord) => {

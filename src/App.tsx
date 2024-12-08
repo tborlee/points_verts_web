@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Banner, BannerType } from "./Banner";
+import { Banner } from "./Banner";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons/faArrowRight";
 import WalkCard from "./WalkCard";
@@ -8,7 +8,7 @@ import Footer from "./Footer";
 import Navbar from "./Navbar";
 import Map from "./Map";
 import { fetchData, fetchDates } from "./api";
-import { calculateDistances, compareWalks, findNextDateIndex } from "./utils";
+import { calculateDistances, compareWalks, findNextDateIndex, BannerType } from "./utils";
 import { APIRecord } from "./types";
 
 function App() {

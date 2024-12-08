@@ -81,3 +81,9 @@ export function findNextDateIndex(dates: Date[]): number | undefined {
   // for some reasons, all dates are in the past, so use the last date.
   return dates.length - 1;
 }
+
+export enum BannerType {
+  warning,
+  error,
+  info,
+}

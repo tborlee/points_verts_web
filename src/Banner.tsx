@@ -2,14 +2,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons/faExclamationCircle";
 import React from "react";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons/faInfoCircle";
+import { BannerType } from "./utils";
 
-export enum BannerType {
-  warning,
-  error,
-  info,
-}
-
-export type BannerProps = {
+type BannerProps = {
   type: BannerType;
   text: string;
   buttonLabel?: string;
@@ -53,7 +48,7 @@ export const Banner = ({
         <div className="column">{text}</div>
         {buttonLabel && (
           <div className="column is-narrow">
-            <button onClick={onButtonClick}>{buttonLabel}</button>
+            <button className="button is-small" onClick={onButtonClick}>{buttonLabel}</button>
           </div>
         )}
       </div>
